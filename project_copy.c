@@ -28,7 +28,7 @@ int openFiles(FILE **fileString, FILE **fileData, FILE **fileParse) {
     *fileString = fopen("string.txt", "r");
     *fileData = fopen("data.txt", "r");
     *fileParse = fopen("parse.txt", "r");
-
+  
     if (!*fileString || !*fileData || !*fileParse) {
         return 0;  /* Return 0 if any file fails to open */
     }
@@ -57,15 +57,15 @@ int countLines(FILE *file) {
 
 /* v_command: Handle the 'v' command option */
 void v_command(int option, FILE **fileString, FILE **fileData, FILE **fileParse, RecordArrays *arrays) {
-    int i;
     if (option == 1) {
-        char stringLine[100], dataLine[100], parseLine[100];
         if (!*fileString || !*fileData || !*fileParse) {
             if (!openFiles(fileString, fileData, fileParse)) {
                 printf("V1: Neotvorene txt subory.\n");
                 return;
             }
         }
+
+        char stringLine[100], dataLine[100], parseLine[100];
 
         while (fgets(stringLine, sizeof(stringLine), *fileString) &&
                fgets(dataLine, sizeof(dataLine), *fileData) &&
@@ -89,6 +89,7 @@ void v_command(int option, FILE **fileString, FILE **fileData, FILE **fileParse,
             return;
         }
 
+        int i;
         for (i = 0; i < arrays->numRecords; i++) {
             printf("ID. mer. modulu: %s\n", arrays->stringArray[i]);
             printf("Hodnota 1: %d\n", arrays->hodnota1Array[i]);
@@ -103,13 +104,14 @@ void v_command(int option, FILE **fileString, FILE **fileData, FILE **fileParse,
 
 /* h_command: Handle the 'h' command option */
 void h_command(FILE *fileString) {
-    int histogram[256];
-    int i;
-    char c;
     if (!fileString) {
         printf("H: Neotvoreny subor.\n");
         return;
     }
+
+    int histogram[256];
+    int i;
+    char c;
 
     /* Initialize histogram */
     for (i = 0; i < 256; i++) {
@@ -144,11 +146,6 @@ void h_command(FILE *fileString) {
 /* n_command: Initialize dynamic arrays with data from files */
 void n_command(FILE *fileString, FILE *fileData, FILE *fileParse, RecordArrays *arrays) {
     int i;
-    int countString;
-    int countData;
-    int countParse;
-    char buffer[256];
-    char dataLine[256];
     if (!fileString || !fileData || !fileParse) {
         printf("N: File not opened.\n");
         return;
@@ -175,9 +172,9 @@ void n_command(FILE *fileString, FILE *fileData, FILE *fileParse, RecordArrays *
     }
 
     /* Count lines in each file */
-    countString = countLines(fileString);
-    countData = countLines(fileData);
-    countParse = countLines(fileParse);
+    int countString = countLines(fileString);
+    int countData = countLines(fileData);
+    int countParse = countLines(fileParse);
 
     /* Find the largest number of records */
     arrays->maxRecords = countString;
@@ -203,6 +200,8 @@ void n_command(FILE *fileString, FILE *fileData, FILE *fileParse, RecordArrays *
     }
 
     /* Read data from files and store into arrays */
+    char buffer[256];
+    char dataLine[256];
     i = 0;
 
     /* Reset file pointers to beginning */
@@ -249,6 +248,11 @@ void n_command(FILE *fileString, FILE *fileData, FILE *fileParse, RecordArrays *
 
 /* q_command: Add a record to the dynamic arrays */
 void q_command(RecordArrays *arrays) {
+    if (!arrays->arraysFilled) {
+        printf("Q: Arrays are not created.\n");
+        return;
+    }
+
     int Y;
     int position;
     char inputBuffer[256];
@@ -257,10 +261,6 @@ void q_command(RecordArrays *arrays) {
     char *newString;
     char *newParse;
     int i;
-    if (!arrays->arraysFilled) {
-        printf("Q: Arrays are not created.\n");
-        return;
-    }
 
     scanf("%d", &Y);
 
@@ -321,13 +321,14 @@ void q_command(RecordArrays *arrays) {
 
 /* w_command: Delete records with given ID from dynamic arrays */
 void w_command(RecordArrays *arrays) {
-    char idToDelete[256];
-    int deletedCount = 0;
-    int i, j;
     if (!arrays->arraysFilled) {
         printf("W: Arrays are not created.\n");
         return;
     }
+
+    char idToDelete[256];
+    int deletedCount = 0;
+    int i, j;
 
     /* Read the ID from the keyboard */
     scanf("%s", idToDelete);
@@ -358,12 +359,13 @@ void w_command(RecordArrays *arrays) {
 
 /* e_command: Search for a word in parseArray and print matching records */
 void e_command(RecordArrays *arrays) {
-    char searchWord[256];
-    int i;
     if (!arrays->arraysFilled) {
         printf("E: Arrays are not created.\n");
         return;
     }
+
+    char searchWord[256];
+    int i;
 
     scanf("%s", searchWord);
 
@@ -435,7 +437,6 @@ int main() {
         } else {
             /* Handle invalid commands if necessary */
         }
-        getchar(); /* Consume newline character */
     }
 
     return 0;
